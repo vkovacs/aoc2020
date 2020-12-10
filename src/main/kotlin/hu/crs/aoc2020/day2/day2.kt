@@ -12,13 +12,16 @@ internal fun validPasswordCount(passwordEntries: List<String>): Int {
     val regex = Regex("([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)")
 
     return passwordEntries.count { it ->
-        val (_, min, max, letter, password) = regex.matchEntire(it)!!.groupValues
+        regex.matchEntire(it)?.let { matchResult ->
+            val (_, min, max, letter, password) = matchResult.groupValues
 
+            val letterCountInPassword = password.filter {
+                it == letter.single()
+            }.count()
 
-        val letterCountInPassword = password.filter {
-            it == letter.single()
-        }.count()
+            return@count letterCountInPassword in (min.toInt()..max.toInt())
+        }
 
-        return@count letterCountInPassword in (min.toInt()..max.toInt())
+        return@count false
     }
 }
