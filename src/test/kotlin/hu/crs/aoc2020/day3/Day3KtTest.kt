@@ -21,6 +21,6 @@ internal class Day3KtTest {
             .#..#...#.#
         """.trimIndent()
 
-        Assertions.assertEquals(7, countTrees(map.lines()))
+        Assertions.assertEquals(7, countTrees(map.lines(), 3, 1))
     }
 }
