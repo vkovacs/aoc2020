@@ -1,4 +1,4 @@
-ecl:grn3
+ecl:grn
 cid:315 iyr:2012 hgt:192cm eyr:2023 pid:873355140 byr:1925 hcl:#cb2c03
 
 byr:2027 hcl:ec0cfd ecl:blu cid:120
