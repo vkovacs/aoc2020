@@ -4,11 +4,11 @@ import java.io.File
 
 fun main() {
     val input = File("src/main/resources/day4.txt").readText()
-    println(validPapersCount(input))
-    println(validPapersCountWithConstraint(input))
+    println(validPassportCount(input, ::validatePassportMap))
+    println(validPassportCount(input, ::validatePassportMapWithConstraints))
 }
 
-internal fun validPapersCount(papers: String): Int {
+internal fun validPassportCount(papers: String, validate : (Map<String, String>) -> Boolean): Int {
     var validPassportsCount = 0
 
     val papersStringList = papers.split("\n\n")
@@ -17,7 +17,7 @@ internal fun validPapersCount(papers: String): Int {
 
         val paperMap = parseToMap(papersString)
 
-        if (validatePaperMap(paperMap)) {
+        if (validate(paperMap)) {
             validPassportsCount++
         }
     }
@@ -25,7 +25,7 @@ internal fun validPapersCount(papers: String): Int {
     return validPassportsCount
 }
 
-private fun parseToMap(papersString: String): MutableMap<String, String> {
+private fun parseToMap(papersString: String): Map<String, String> {
     val paperMap = mutableMapOf<String, String>()
 
     for (keyValue in papersString.split(" ")) {
@@ -39,29 +39,12 @@ private fun parseToMap(papersString: String): MutableMap<String, String> {
     return paperMap
 }
 
-fun validatePaperMap(paperMap: MutableMap<String, String>): Boolean {
+fun validatePassportMap(paperMap: Map<String, String>): Boolean {
     return paperMap["byr"] != null && paperMap["iyr"] != null && paperMap["eyr"] != null && paperMap["hgt"] != null &&
             paperMap["hcl"] != null && paperMap["ecl"] != null && paperMap["pid"] != null
 }
 
-internal fun validPapersCountWithConstraint(papers: String): Int {
-    var validPassportsCount = 0
-
-    val papersStringList = papers.split("\n\n")
-    for (papersStringDelimited in papersStringList) {
-        val papersString = papersStringDelimited.replace("\n", " ")
-
-        val paperMap = parseToMap(papersString)
-
-        if (validatePaperMapWithConstraints(paperMap)) {
-            validPassportsCount++
-        }
-    }
-
-    return validPassportsCount
-}
-
-fun validatePaperMapWithConstraints(paperMap: MutableMap<String, String>): Boolean {
+fun validatePassportMapWithConstraints(paperMap: Map<String, String>): Boolean {
     val byr = paperMap["byr"]
     val iyr = paperMap["iyr"]
     val eyr = paperMap["eyr"]
