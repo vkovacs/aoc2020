@@ -21,7 +21,7 @@ internal class Day4KtTest {
             hcl:#cfa07d eyr:2025 pid:166559648
             iyr:2011 ecl:brn hgt:59in""".trimIndent()
 
-        Assertions.assertEquals(2, validPassportCount(papers))
+        Assertions.assertEquals(2, validPassportCount(papers, ::validatePassportMap))
     }
 
     @Test
@@ -39,7 +39,7 @@ internal class Day4KtTest {
             eyr:2022
 
             iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719""".trimIndent()
-        Assertions.assertEquals(4, validPapersCountWithConstraint(papers))
+        Assertions.assertEquals(4, validPassportCount(papers, ::validatePassportMapWithConstraints))
     }
 
     @Test
@@ -58,6 +58,6 @@ internal class Day4KtTest {
             hgt:59cm ecl:zzz
             eyr:2038 hcl:74454a iyr:2023
             pid:3556412378 byr:2007""".trimIndent()
-        Assertions.assertEquals(0, validPapersCountWithConstraint(papers))
+        Assertions.assertEquals(0, validPassportCount(papers, ::validatePassportMapWithConstraints))
     }
 }
