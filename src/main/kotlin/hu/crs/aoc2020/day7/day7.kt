@@ -4,7 +4,8 @@ import java.io.File
 
 fun main() {
     val input = File("src/main/resources/day7.txt").readText()
-    println(bagCountThatContainMyBag(input))
+    println("Solution 1: ${bagCountThatContainMyBag(input)}")
+    println("Solution 2: ${countBagsInShinyGoldenBag(input)}")
 }
 
 fun bagCountThatContainMyBag(rules: String): Int {
@@ -14,7 +15,6 @@ fun bagCountThatContainMyBag(rules: String): Int {
 
     do {
         canContainDirectlyOrIndirectlyUpdated = containingBags(rulesList, canContain)
-        println(canContainDirectlyOrIndirectlyUpdated)
         if (canContain == canContainDirectlyOrIndirectlyUpdated) {
             return canContain.size - 1
         } else {
@@ -29,9 +29,12 @@ private fun containingBags(rulesList: List<String>, canContain: Set<String>): Se
     canContainNewBags.addAll(canContain)
 
     val directContainRegex1 = Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags)\\.")
-    val directContainRegex2 = Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
-    val directContainRegex3 = Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
-    val directContainRegex4 = Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
+    val directContainRegex2 =
+        Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
+    val directContainRegex3 =
+        Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
+    val directContainRegex4 =
+        Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
 
     for (rule in rulesList) {
         val matchContainment1 = directContainRegex1.matchEntire(rule)
@@ -99,4 +102,45 @@ private fun containingBags(rulesList: List<String>, canContain: Set<String>): Se
         }
     }
     return canContainNewBags
+}
+
+internal fun countBagsInShinyGoldenBag(rules: String): Int {
+    return countBags(graph(rules), "shiny gold")
+}
+
+fun countBags(graph: Map<String, List<Pair<Int, String>>>, nodeName: String): Int {
+    val node = graph[nodeName]!!
+
+    var sum = 0
+    for (bag in node) {
+        sum += bag.first + bag.first * countBags(graph, bag.second)
+    }
+
+    return sum
+}
+
+
+private fun graph(rules: String): Map<String, List<Pair<Int, String>>> {
+    val graph: MutableMap<String, MutableList<Pair<Int, String>>> = mutableMapOf()
+    rules.replace("bags", "bag")
+        .replace(".", "")
+        .split("\n")
+        .forEach {
+            var (container, contains) = it.split(" bag contain")
+            contains = contains.replace("bag", "")
+            val containedBags = contains.split(",")
+
+            val countColorRegex = Regex("([0-9])+ ([a-z ]+)")
+            graph[container] = mutableListOf()
+
+            for (bag in containedBags) {
+                val bagCountColorMatch = countColorRegex.matchEntire(bag.trim())
+                if (bagCountColorMatch != null) {
+                    val (_, count, color) = bagCountColorMatch.groupValues
+                    graph[container]!!.add(count.toInt() to color)
+                }
+            }
+        }
+
+    return graph
 }
