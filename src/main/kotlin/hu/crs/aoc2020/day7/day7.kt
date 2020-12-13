@@ -4,17 +4,17 @@ import java.io.File
 
 fun main() {
     val input = File("src/main/resources/day7.txt").readText()
-    println("Solution 1: ${bagCountThatContainMyBag(input)}")
-    println("Solution 2: ${countBagsInShinyGoldenBag(input)}")
+    val bagGraph = graph(input)
+    println("Solution 1: ${bagCountThatContainMyBag(bagGraph)}")
+    println("Solution 2: ${countBagsInShinyGoldenBag(bagGraph)}")
 }
 
-fun bagCountThatContainMyBag(rules: String): Int {
-    val rulesList = rules.split("\n")
+fun bagCountThatContainMyBag(bagGraph: Map<String, List<Pair<Int, String>>>): Int {
     val canContain = mutableSetOf("shiny gold")
     var canContainDirectlyOrIndirectlyUpdated: Set<String>
 
     do {
-        canContainDirectlyOrIndirectlyUpdated = containingBags(rulesList, canContain)
+        canContainDirectlyOrIndirectlyUpdated = containingBags(bagGraph, canContain)
         if (canContain == canContainDirectlyOrIndirectlyUpdated) {
             return canContain.size - 1
         } else {
@@ -23,89 +23,25 @@ fun bagCountThatContainMyBag(rules: String): Int {
     } while (true)
 }
 
-private fun containingBags(rulesList: List<String>, canContain: Set<String>): Set<String> {
+private fun containingBags(bagGraph: Map<String, List<Pair<Int, String>>>, canContain: Set<String>): Set<String> {
+    val updatedCanContain = mutableSetOf<String>()
+    updatedCanContain.addAll(canContain)
 
-    val canContainNewBags = mutableSetOf<String>()
-    canContainNewBags.addAll(canContain)
-
-    val directContainRegex1 = Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags)\\.")
-    val directContainRegex2 =
-        Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
-    val directContainRegex3 =
-        Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
-    val directContainRegex4 =
-        Regex("([a-z ]+) bags contain ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags), ([0-9]+) ([a-z ]+) (bag|bags)\\.");
-
-    for (rule in rulesList) {
-        val matchContainment1 = directContainRegex1.matchEntire(rule)
-        if (matchContainment1 != null) {
-            val containedBagColor0 = matchContainment1.groupValues[3]
-            if (canContainNewBags.contains(containedBagColor0))
-                canContainNewBags.add(matchContainment1.groupValues[1])
-            continue
-        }
-        val matchContainment2 = directContainRegex2.matchEntire(rule)
-        if (matchContainment2 != null) {
-            val containedBagColor0 = matchContainment2.groupValues[3]
-            if (canContainNewBags.contains(containedBagColor0)) {
-                canContainNewBags.add(matchContainment2.groupValues[1])
-                continue
-            }
-            val containedBagColor1 = matchContainment2.groupValues[6]
-            if (canContainNewBags.contains(containedBagColor1)) {
-                canContainNewBags.add(matchContainment2.groupValues[1])
-                continue
-            }
-        }
-
-        val matchContainment3 = directContainRegex3.matchEntire(rule)
-        if (matchContainment3 != null) {
-            val containedBagColor0 = matchContainment3.groupValues[3]
-            if (canContainNewBags.contains(containedBagColor0)) {
-                canContainNewBags.add(matchContainment3.groupValues[1])
-                continue
-            }
-            val containedBagColor1 = matchContainment3.groupValues[6]
-            if (canContainNewBags.contains(containedBagColor1)) {
-                canContainNewBags.add(matchContainment3.groupValues[1])
-                continue
-            }
-            val containedBagColor2 = matchContainment3.groupValues[9]
-            if (canContainNewBags.contains(containedBagColor2)) {
-                canContainNewBags.add(matchContainment3.groupValues[1])
-                continue
-            }
-        }
-
-        val matchContainment4 = directContainRegex4.matchEntire(rule)
-        if (matchContainment4 != null) {
-            val containedBagColor0 = matchContainment4.groupValues[3]
-            if (canContainNewBags.contains(containedBagColor0)) {
-                canContainNewBags.add(matchContainment4.groupValues[1])
-                continue
-            }
-            val containedBagColor1 = matchContainment4.groupValues[6]
-            if (canContainNewBags.contains(containedBagColor1)) {
-                canContainNewBags.add(matchContainment4.groupValues[1])
-                continue
-            }
-            val containedBagColor2 = matchContainment4.groupValues[9]
-            if (canContainNewBags.contains(containedBagColor2)) {
-                canContainNewBags.add(matchContainment4.groupValues[1])
-                continue
-            }
-            val containedBagColor3 = matchContainment4.groupValues[12]
-            if (canContainNewBags.contains(containedBagColor3)) {
-                canContainNewBags.add(matchContainment4.groupValues[1])
-                continue
+    canContain.forEach { bagsCanContain ->
+        bagGraph.entries.forEach { isContain ->
+            isContain.value.forEach {
+                if (it.second == bagsCanContain) {
+                    updatedCanContain.add(isContain.key)
+                }
             }
         }
     }
-    return canContainNewBags
+
+    return updatedCanContain
 }
 
-internal fun countBagsInShinyGoldenBag(rules: String): Int {
-    return countBags(graph(rules), "shiny gold")
+internal fun countBagsInShinyGoldenBag(bagGraph: Map<String, List<Pair<Int, String>>>): Int {
+    return countBags(bagGraph, "shiny gold")
 }
 
 fun countBags(graph: Map<String, List<Pair<Int, String>>>, nodeName: String): Int {
@@ -120,7 +56,7 @@ fun countBags(graph: Map<String, List<Pair<Int, String>>>, nodeName: String): In
 }
 
 
-private fun graph(rules: String): Map<String, List<Pair<Int, String>>> {
+internal fun graph(rules: String): Map<String, List<Pair<Int, String>>> {
     val graph: MutableMap<String, MutableList<Pair<Int, String>>> = mutableMapOf()
     rules.replace("bags", "bag")
         .replace(".", "")

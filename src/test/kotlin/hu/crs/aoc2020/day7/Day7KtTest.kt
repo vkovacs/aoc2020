@@ -1,7 +1,6 @@
 package hu.crs.aoc2020.day7
 
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 internal class Day7KtTest {
@@ -16,7 +15,7 @@ internal class Day7KtTest {
             dark olive bags contain 1 shiny gold bag, 1 faded blue bag.
             light red bags contain 1 bright white bag, 2 shiny gold bags.
         """.trimIndent()
-        Assertions.assertEquals(6, bagCountThatContainMyBag(rules))
+        Assertions.assertEquals(6, bagCountThatContainMyBag(graph(rules)))
     }
 
     @Test
@@ -32,7 +31,7 @@ internal class Day7KtTest {
         faded blue bags contain no other bags.
         dotted black bags contain no other bags.""".trimIndent()
 
-        Assertions.assertEquals(4, bagCountThatContainMyBag(rules))
+        Assertions.assertEquals(4, bagCountThatContainMyBag(graph(rules)))
     }
 
     @Test
@@ -48,7 +47,7 @@ internal class Day7KtTest {
             faded blue bags contain no other bags.
             dotted black bags contain no other bags.
         """.trimIndent()
-        Assertions.assertEquals(32, countBagsInShinyGoldenBag(rules))
+        Assertions.assertEquals(32, countBagsInShinyGoldenBag(graph(rules)))
     }
 
     @Test
@@ -61,7 +60,7 @@ internal class Day7KtTest {
             dark green bags contain 2 dark blue bags.
             dark blue bags contain 2 dark violet bags.
             dark violet bags contain no other bags.""".trimIndent()
-            Assertions.assertEquals(126, countBagsInShinyGoldenBag(rules))
+            Assertions.assertEquals(126, countBagsInShinyGoldenBag(graph(rules)))
     }
 }
 
